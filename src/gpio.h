@@ -97,8 +97,7 @@ typedef struct {
     volatile uint32_t ODR;      // 0x14
     volatile uint32_t BSRR;     // 0x18
     volatile uint32_t LCKR;     // 0x1C
-    volatile uint32_t AFRL;     // 0x20
-    volatile uint32_t AFRH;     // 0x24
+    volatile uint32_t AFR[2];     // 0x20 & 0x24
 } GPIO_TypeDef;
 
 // Define GPIO registers for GPIOA, GPIOB, and GPIOC
@@ -181,7 +180,7 @@ typedef struct {
 // ADC1 base address 
 #define ADC1_BASE 0x40012000
 
-// ADC1 register offsets
+// ADC register offsets
 #define ADC1_SR_OFFSET        0x00
 #define ADC1_CR1_OFFSET       0x04
 #define ADC1_CR2_OFFSET       0x08
@@ -311,19 +310,65 @@ typedef struct {
 // Define TIM EGR register bit offsets
 #define TIM_EGR_UG         (1 << 0)
 
+// Typedef to easily write alternate functions
+typedef enum {
+    AF0 = 0,
+    AF1 = 1,
+    AF2 = 2,
+    AF3 = 3,
+    AF4 = 4,
+    AF5 = 5,
+    AF6 = 6,
+    AF7 = 7,
+    AF8 = 8,
+    AF9 = 9,
+    AF10 = 10,
+    AF11 = 11,
+    AF12 = 12,
+    AF13 = 13,
+    AF14 = 14,
+    AF15 = 15
+} AlternateFunction;
+
+// Typedef for timer channels
+typedef enum {
+    CH1 = 1,
+    CH2 = 2,
+    CH3 = 3,
+    CH4 = 4,
+    CH5 = 5
+} TimerChannel;
+
 // PWM Channel map top map each pin to a pwm channel
 typedef struct {
     Pin pin;
     TIM_TypeDef *timer;
     volatile uint32_t *ccr;
-    uint8_t channel;
-    uint8_t af;
+    TimerChannel channel;
+    AlternateFunction af;
 } PwmChannelMap;
 
-static const PwmChannelMap pwm_pin_map[] = {
-    { B0, TIM3, &TIM3->CCR3, 3, 2 }, // TIM3_CH3 → PB0, AF2
-    { B1, TIM3, &TIM3->CCR4, 4, 2 }, // TIM3_CH4 → PB1, AF2
-    { A8, TIM1, &TIM1->CCR1, 1, 1 }, // TIM1_CH1 → PA8, AF1
+// A0-A3, A6-A10, A15, B0-B9
+// Format: Pin, *timer, *ccr, channel, alternateFunction 
+static const PwmChannelMap pwmPinMap[] = {
+    { A0,  TIM2, &TIM2->CCR1, CH1, AF1 },
+    { A1,  TIM2, &TIM2->CCR2, CH2, AF1 },
+    { A2,  TIM2, &TIM2->CCR3, CH3, AF1 },
+    { A3,  TIM2, &TIM2->CCR4, CH4, AF1 },
+    { A6,  TIM3, &TIM3->CCR1, CH1, AF2 },
+    { A7,  TIM3, &TIM3->CCR2, CH2, AF2 },
+    { A8,  TIM1, &TIM1->CCR1, CH1, AF1 },
+    { A9,  TIM1, &TIM1->CCR2, CH2, AF1 },
+    { A10, TIM1, &TIM1->CCR3, CH3, AF1 },
+    { A15, TIM2, &TIM2->CCR1, CH1, AF1 },
+    { B0,  TIM3, &TIM3->CCR3, CH3, AF2 },
+    { B1,  TIM3, &TIM3->CCR4, CH4, AF2 },
+    { B4,  TIM3, &TIM3->CCR1, CH1, AF2 },
+    { B5,  TIM3, &TIM3->CCR2, CH2, AF2 },
+    { B6,  TIM4, &TIM4->CCR1, CH1, AF2 },
+    { B7,  TIM4, &TIM4->CCR2, CH2, AF2 },
+    { B8,  TIM4, &TIM4->CCR3, CH3, AF2 },
+    { B9,  TIM4, &TIM4->CCR4, CH4, AF2 },
 };
 
 // Typedef for GPIO States
@@ -360,9 +405,11 @@ AdcChannel gpioToAdcChannel(Pin pin);
 uint16_t adcReadChannel(AdcChannel channel);
 uint16_t adcReadPin(Pin pin);
 
-//void pwmInitAll(void);
+void pwmInitAll(void);
+void pwmInitPin(Pin pin);
+void pwmInitTimer(TIM_TypeDef *timer, TimerChannel channel);
 //void pwmAttach(Pin pin, uint32_t frequency);
-//void pwmWrite(Pin pin, uint16_t dutyCycle);
+void pwmWrite(Pin pin, uint8_t dutyCycle);
 const PwmChannelMap *getPwmMap(Pin pin);
 
 

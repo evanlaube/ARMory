@@ -84,11 +84,98 @@ uint16_t adcReadChannel(AdcChannel channel) {
 }
 
 const PwmChannelMap *getPwmMap(Pin pin) {
-    for (int i = 0; i < sizeof(pwm_pin_map) / sizeof(PwmChannelMap); i++) {
-        if (pwm_pin_map[i].pin.port == pin.port && pwm_pin_map[i].pin.pin == pin.pin) {
-            return &pwm_pin_map[i];
+    for (int i = 0; i < sizeof(pwmPinMap) / sizeof(PwmChannelMap); i++) {
+        if (pwmPinMap[i].pin.port == pin.port && pwmPinMap[i].pin.pin == pin.pin) {
+            return &pwmPinMap[i];
         }
     }
     return NULL;
 }
 
+void pwmInitTimer(TIM_TypeDef *timer, TimerChannel channel) {
+    // Enable to timer clock
+    if(timer == TIM1) {
+        RCC->APB2ENR |= (1 << 0);
+    } else if(timer == TIM2) {
+        RCC->APB1ENR |= (1 << 0);
+    } else if(timer == TIM3) {
+        RCC->APB1ENR |= (1 << 1);
+    } else if(timer == TIM4) {
+        RCC->APB1ENR |= (1 << 2);
+    } else if(timer == TIM5) {
+        // Current configuration does not use TIM5, but include for future proofing
+        RCC->APB1ENR |= (1<<3);
+    } else {
+        // Invalid PWM pin
+        return;
+    }
+
+    // Setup timer registers
+    timer->PSC = 327; // Roughly 1khz PWM frequency
+    timer->ARR = 255; // Allow PWM values to be written to 8 bits
+    timer->CR1 |= (1 << 7); // ARPE
+    timer->CR1 |= (1 << 0); // CEN
+    //timer->CCMR1 |= (0x06 << 4); // Set OC1 mode to PWM
+    //timer->CCMR1 |= (1 << 3); // Enable OC1 Preload
+    //timer->CCER |= (1 << 0); //Enable capture/compare CH1 output
+    //timer->DIER |= (1 << 0); //Enable update interrupt    
+
+    // Set channel mode (PWM Mode 1) + preload + enable output
+    switch (channel) {
+        case CH1:
+            timer->CCMR1 &= ~(0b111 << 4);
+            timer->CCMR1 |=  (0b110 << 4);
+            timer->CCMR1 |=  (1 << 3); // OC1PE
+            timer->CCER   |=  (1 << 0); // CC1E
+            break;
+        case CH2:
+            timer->CCMR1 &= ~(0b111 << 12);
+            timer->CCMR1 |=  (0b110 << 12);
+            timer->CCMR1 |=  (1 << 11); // OC2PE
+            timer->CCER   |=  (1 << 4); // CC2E
+            break;
+        case CH3:
+            timer->CCMR2 &= ~(0b111 << 4);
+            timer->CCMR2 |=  (0b110 << 4);
+            timer->CCMR2 |=  (1 << 3); // OC3PE
+            timer->CCER   |=  (1 << 8); // CC3E
+            break;
+        case CH4:
+            timer->CCMR2 &= ~(0b111 << 12);
+            timer->CCMR2 |=  (0b110 << 12);
+            timer->CCMR2 |=  (1 << 11); // OC4PE
+            timer->CCER   |=  (1 << 12); // CC4E
+            break;
+        case CH5:
+            // Don't implement CH5 for now.
+            break;
+    }
+
+    if(timer == TIM1) {
+        timer->BDTR |= (1 << 15);
+    }
+}
+
+void pwmInitPin(Pin pin) {
+    // First get the pwmMap for the given pin
+    const PwmChannelMap *map = getPwmMap(pin);
+
+    // Make sure that the GPIO reg that the pin is on is enabled
+    gpioInit(pin.port);
+    // Set the gpio mode for the pin to alternate function
+    gpioPinMode(pin, ALTERNATE_FUNC); 
+    
+    // Set which alternate function to use for the pin
+    pin.port->AFR[pin.pin / 8] &= ~(0xF << ((pin.pin % 8) * 4)); // clear
+    pin.port->AFR[pin.pin / 8] |=  (map->af  << ((pin.pin % 8) * 4)); // set
+                                                                      //
+    // Initialize timer attached to pin
+    pwmInitTimer(map->timer, map->channel);
+}
+
+void pwmWrite(Pin pin, uint8_t dutyCycle) {
+    const PwmChannelMap *map = getPwmMap(pin);
+    // Return if the pin is not PWM available
+    if(!map) return;
+    *(map->ccr) = dutyCycle;
+}
