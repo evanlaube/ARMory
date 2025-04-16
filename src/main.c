@@ -1,82 +1,82 @@
+
 #include "gpio.h"
-#define RED_LED B0
-#define GREEN_LED B1
-#define BLUE_LED A8
 
-#define BUTTON_PIN A0
-#define POT_PIN A1
+#define RED_LED     A8
+#define GREEN_LED   A9
+#define BLUE_LED   A10
 
-#define GPIOC_MODER  (*(volatile unsigned int*)0x40020800)
-#define GPIOC_ODR    (*(volatile unsigned int*)0x40020814)
+#define JOY_X    A6 
+#define JOY_Y    A7 
+#define JOY_SW   B5
 
-int main(void) {
-    gpioInitAll(); 
-    adcInit();
+#define JOY_DEADZONE 400
+#define JOY_RAW_MIN  500
+#define JOY_RAW_MAX  3000
+#define JOY_CENTER   2048
+#define JOY_OUTPUT_MAX 127
 
-    gpioPinMode(BUTTON_PIN, INPUT);
-    gpioSetPull(BUTTON_PIN, PULL_UP);
+#define OLED_SCL B6
+#define OLED_SDA B7
 
-    gpioPinMode(POT_PIN, ANALOG);
-    gpioSetPull(POT_PIN, NO_PULL);
+int16_t absVal(int16_t a) {
+    if(a < 0) {
+        return -a;
+    }
+    return a;
+}
 
-    pwmInitPin(BLUE_LED);
-    pwmInitPin(RED_LED);
-    pwmInitPin(GREEN_LED);
+volatile int16_t deltaX = 0;
+volatile int16_t deltaY = 0;
+volatile PinState joystickPressed = HIGH;
 
-    uint8_t redBrightness   = 200;
-    uint8_t greenBrightness = 51;
-    uint8_t blueBrightness  = 255;
 
-    // Keep track of mode of color picker:
-    // 0 -> Display color
-    // 1 -> Set Red
-    // 2 -> Set Green
-    // 3 -> Set Blue
-    uint8_t mode = 1;
-    
-    // Software debounce button (kind of)
-    uint16_t buttonWait = 1000;
-    uint16_t potValue = 4095;
-    uint8_t potValueScaled;
-    while(1) {
-        uint16_t potValue = adcReadPin(POT_PIN); // 0–4095
-        if(potValue < 24) {
-            potValue = 0;
-        }
-        uint8_t scaledR = (redBrightness   * potValue) / 4095;
-        uint8_t scaledG = (greenBrightness * potValue) / 4095;
-        uint8_t scaledB = (blueBrightness  * potValue) / 4095;
+static int16_t scaleJoystick(int raw) {
+    int centered = raw - JOY_CENTER;
 
-        if (mode == 0) {
-            pwmWrite(RED_LED,   scaledR);
-            pwmWrite(GREEN_LED, scaledG);
-            pwmWrite(BLUE_LED,  scaledB);
-        } else if (mode == 1) {
-            redBrightness = (potValue * 255) / 4095;
-            pwmWrite(RED_LED,   redBrightness);
-            pwmWrite(GREEN_LED, 0);
-            pwmWrite(BLUE_LED,  0);
-        } else if (mode == 2) {
-            greenBrightness = (potValue * 255) / 4095;
-            pwmWrite(RED_LED,   0);
-            pwmWrite(GREEN_LED, greenBrightness);
-            pwmWrite(BLUE_LED,  0);
-        } else if (mode == 3) {
-            blueBrightness = (potValue * 255) / 4095;
-            pwmWrite(RED_LED,   0);
-            pwmWrite(GREEN_LED, 0);
-            pwmWrite(BLUE_LED,  blueBrightness);
-        }
-
-        // Mode switch with software debounce
-        if (!gpioDigitalRead(BUTTON_PIN) && buttonWait > 2000) {
-            mode = (mode + 1) % 4;
-            buttonWait = 0;
-        }
-
-        if (buttonWait <= 2000) {
-            buttonWait++;
-        }
+    if (centered > JOY_DEADZONE) {
+        return ((centered - JOY_DEADZONE) * JOY_OUTPUT_MAX) / (JOY_RAW_MAX - JOY_CENTER - JOY_DEADZONE);
+    } else if (centered < -JOY_DEADZONE) {
+        return ((centered + JOY_DEADZONE) * JOY_OUTPUT_MAX) / (JOY_CENTER - JOY_RAW_MIN - JOY_DEADZONE);
+    } else {
+        return 0;
     }
 }
 
+void readJoystick(void) {
+    int rawX = adcReadPin(JOY_X);
+    int rawY = adcReadPin(JOY_Y);
+
+    deltaX = scaleJoystick(rawX);
+    deltaY = scaleJoystick(rawY);
+
+    joystickPressed = !gpioDigitalRead(JOY_SW); // active low
+}
+
+int main() {
+    gpioInitAll();
+    adcInit();
+
+    pwmInitPin(RED_LED);
+    gpioPinMode(GREEN_LED, OUTPUT);
+    pwmInitPin(BLUE_LED);
+
+    gpioPinMode(JOY_X,  ANALOG);
+    gpioPinMode(JOY_Y,  ANALOG);
+    gpioPinMode(JOY_SW, INPUT);
+
+    gpioSetPull(JOY_X, NO_PULL);
+    gpioSetPull(JOY_Y, NO_PULL);
+    gpioSetPull(JOY_SW, PULL_UP);
+
+    while(1) {
+        readJoystick();
+        gpioWrite(GREEN_LED, joystickPressed);
+
+        uint8_t redBrightness  = absVal(deltaX);
+        uint8_t blueBrightness = absVal(deltaY);
+
+        pwmWrite(RED_LED, redBrightness);
+        pwmWrite(BLUE_LED, blueBrightness);
+    }
+    
+}
