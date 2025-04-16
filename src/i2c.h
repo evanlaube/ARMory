@@ -1,0 +1,32 @@
+
+#ifndef I2C_H
+#define I2C_H
+
+#include <stdint.h>
+#include <stdbool.h>
+
+typedef struct {
+    volatile uint32_t CR1;       // 0x00: Control register 1
+    volatile uint32_t CR2;       // 0x04: Control register 2
+    volatile uint32_t OAR1;      // 0x08: Own address register 1
+    volatile uint32_t OAR2;      // 0x0C: Own address register 2
+    volatile uint32_t DR;        // 0x10: Data register
+    volatile uint32_t SR1;       // 0x14: Status register 1
+    volatile uint32_t SR2;       // 0x18: Status register 2
+    volatile uint32_t CCR;       // 0x1C: Clock control register
+    volatile uint32_t TRISE;     // 0x20: TRISE register
+    volatile uint32_t FLTR;      // 0x24: Filter register
+} I2C_TypeDef;
+
+#define I2C1 ((I2C_TypeDef *)0x40005400)
+#define I2C2 ((I2C_TypeDef *)0x40005800)
+
+void i2cInit(I2C_TypeDef i2c);
+void i2cStart(I2C_TypeDef i2c);
+void i2cStop(I2C_TypeDef i2c);
+void i2cSendAddr(I2C_TypeDef i2c, uint8_t addr, bool read);
+void i2cWriteByte(I2C_TypeDef *i2c, uint8_t byte);
+void i2cReadByte(I2C_TypeDef *i2c, bool ack);
+
+
+#endif // !I2C_H
