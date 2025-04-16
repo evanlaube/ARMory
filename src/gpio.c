@@ -50,7 +50,10 @@ void gpioSetPull(Pin pin, PinPullMode pullMode) {
 }
 
 PinState gpioDigitalRead(Pin pin) {
-    return (PinState) (pin.port->IDR) & (1 << pin.pin);
+    if((pin.port->IDR) & (1<<pin.pin)) {
+        return HIGH;
+    }
+    return LOW;
 }
 
 void adcInit(void) {
