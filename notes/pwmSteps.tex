@@ -1,0 +1,48 @@
+\documentclass[12pt]{article}
+\usepackage{enumitem}
+\usepackage{geometry}
+\usepackage{parskip}
+\geometry{margin=1in}
+
+\title{PWM Setup on STM32F411}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section*{Steps to Use a PWM Pin on STM32F411}
+
+\begin{enumerate}[label=\textbf{Step \arabic*:}]
+    \item \textbf{Select a Timer and Channel} \\
+    Choose a timer (e.g., TIM1, TIM2, etc.) that supports PWM output. Then select a channel on that timer (typically Channel 1 to 4).
+
+    \item \textbf{Identify a PWM-capable GPIO Pin} \\
+    Use the STM32 alternate function mapping table to find a GPIO pin that supports the selected timer and channel combination.
+
+    \item \textbf{Enable Peripheral Clocks} \\
+    Enable the RCC (Reset and Clock Control) for both the selected timer and the GPIO port that includes the chosen pin.
+
+    \item \textbf{Configure the GPIO Pin} \\
+    Set the pin to alternate function mode. Assign the appropriate alternate function number, and configure it as a push-pull output with an appropriate speed.
+
+    \item \textbf{Configure the Timer} 
+        \begin{itemize}[label=--]
+        \item Set the timer to up-counting mode.
+        \item Adjust the prescaler to set the base frequency.
+        \item Set the auto-reload register (ARR) to define the PWM period.
+        \item Set the compare register (CCR) to define the duty cycle.
+    \end{itemize}
+
+    \item \textbf{Enable PWM Output Mode} \\
+    Configure the timer's output compare mode for the selected channel (PWM Mode 1 or 2) and enable preload so duty cycle changes take effect correctly.
+
+    \item \textbf{Enable Timer Output (if required)} \\
+    For advanced-control timers like TIM1, enable the main output by setting the MOE (Main Output Enable) bit.
+
+    \item \textbf{Start the Timer} \\
+    Enable the timer counter to start generating PWM signals on the configured pin.
+\end{enumerate}
+
+\end{document}

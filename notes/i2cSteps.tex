@@ -1,0 +1,71 @@
+\documentclass[12pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\title{Steps for Initializing I2C on STM32F411}
+\author{}
+\date{}
+
+\usepackage{fontspec}
+\setmonofont{JetBrainsMono Nerd Font}[Weight = Regular]
+
+\begin{document}
+\maketitle
+
+\section*{I2C Initialization Overview}
+
+The following steps outline how to configure the STM32F411 microcontroller for I\textsuperscript{2}C communication in master mode. These apply to standard or fast mode (100kHz or 400kHz), using I2C1 or I2C2.
+
+\section*{Initialization Steps}
+
+\begin{enumerate}[label=\textbf{Step \arabic*:}, leftmargin=2.5em]
+  \item \textbf{Enable Peripheral Clocks}
+  \begin{itemize}
+    \item Enable the clock for the I2C peripheral in \texttt{RCC\_APB1ENR}.
+    \item Enable the clock for the GPIO port containing the SDA and SCL pins.
+  \end{itemize}
+
+  \item \textbf{Configure GPIO Pins}
+  \begin{itemize}
+    \item Set each pin to \textbf{alternate function mode} in \texttt{MODER}.
+    \item Select \textbf{AF4} (I2C) in the \texttt{AFR} registers.
+    \item Set the pins to \textbf{open-drain output} using \texttt{OTYPER}.
+    \item Enable \textbf{pull-up resistors} in \texttt{PUPDR}.
+    \item Optionally configure pins for \textbf{high-speed output} in \texttt{OSPEEDR}.
+  \end{itemize}
+
+  \item \textbf{Disable and Reset the I2C Peripheral}
+  \begin{itemize}
+    \item Clear the \texttt{PE} (Peripheral Enable) bit in \texttt{I2C\_CR1}.
+    \item Optionally reset the peripheral using \texttt{RCC\_APB1RSTR}.
+  \end{itemize}
+
+  \item \textbf{Configure Clock Settings}
+  \begin{itemize}
+    \item Set the APB1 clock frequency (in MHz) in \texttt{I2C\_CR2}.
+  \end{itemize}
+
+  \item \textbf{Configure Timing Parameters}
+  \begin{itemize}
+    \item Set the \texttt{CCR} register for the desired clock speed.
+    \item Set the \texttt{TRISE} register:
+    \begin{itemize}
+      \item Standard mode: \texttt{TRISE = CR2 + 1}
+      \item Fast mode: \texttt{TRISE = (CR2 $\times$ 300ns) + 1}
+    \end{itemize}
+  \end{itemize}
+
+  \item \textbf{Enable the I2C Peripheral}
+  \begin{itemize}
+    \item Set the \texttt{PE} bit in \texttt{I2C\_CR1}.
+  \end{itemize}
+\end{enumerate}
+
+\section*{Optional Configuration}
+\begin{itemize}
+  \item Configure digital filtering in \texttt{I2C\_FLTR}.
+  \item Enable ACKing in \texttt{I2C\_CR1} if performing reads.
+  \item Configure \texttt{OAR1} and \texttt{OAR2} if slave address recognition is needed.
+\end{itemize}
+
+\end{document}
