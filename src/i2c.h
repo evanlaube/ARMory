@@ -7,8 +7,19 @@
 
 #include "gpio.h"
 
+#define I2C_TIMEOUT_TIME 10000
+
 #define I2C_CR1_PE    ( 1 <<  0 )
+#define I2C_CR1_START ( 1 <<  8 )
+#define I2C_CR1_STOP  ( 1 <<  9 )
 #define I2C_CR1_SWRST ( 1 << 15 )
+
+#define I2C_SR1_SB    ( 1 <<  0 )
+#define I2C_SR1_ADDR  ( 1 <<  1 )
+#define I2C_SR1_BTF   ( 1 <<  2 )
+#define I2C_SR1_AF    ( 1 << 10 )
+
+#define I2C_SR2_BUSY  ( 1 <<  1 )
 
 typedef struct {
     volatile uint32_t CR1;       // 0x00: Control register 1
@@ -55,12 +66,21 @@ static const I2CMap i2cPinMap[] = {
     //{ I2C3,  }
 };
 
+typedef enum {
+    I2C_OK,
+    I2C_TIMEOUT,
+    I2C_NACK,
+    I2C_ERROR
+} I2CResult;
+
 const I2CMap *getI2CMap(I2C_TypeDef *i2c);
 void i2cInit(I2C_TypeDef *i2c);
 void i2cStart(I2C_TypeDef *i2c);
 void i2cStop(I2C_TypeDef *i2c);
 void i2cSendAddr(I2C_TypeDef *i2c, uint8_t addr, bool read);
-void i2cWriteByte(I2C_TypeDef *i2c, uint8_t byte);
+I2CResult i2cWriteByte(I2C_TypeDef *i2c, uint8_t devAddr, uint8_t regAddr, uint8_t data);
+I2CResult i2cWriteRaw(I2C_TypeDef *i2c, uint8_t devAddr, uint8_t data);
+I2CResult i2cWriteBytes(I2C_TypeDef *i2c, uint8_t devAddr, uint8_t *data, uint16_t n);
 void i2cReadByte(I2C_TypeDef *i2c, bool ack);
 
 

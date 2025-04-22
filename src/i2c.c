@@ -51,3 +51,119 @@ void i2cInit(I2C_TypeDef *i2c) {
     // Enable i2c peripheral
     i2c->CR1 |= I2C_CR1_PE;
 }
+
+void i2cStart(I2C_TypeDef *i2c) {
+    i2c->CR1 |= I2C_CR1_START;
+    while(!(i2c->SR1 & I2C_SR1_SB));
+}
+
+void i2cStop(I2C_TypeDef *i2c) {
+    i2c->CR1 |= I2C_CR1_STOP;
+    while(i2c->SR2 & I2C_SR2_BUSY);
+}
+
+I2CResult i2cWriteByte(I2C_TypeDef *i2c, uint8_t devAddr, uint8_t regAddr, uint8_t data) {
+    // Start the i2c connection
+    i2cStart(i2c);
+    
+    // Send device address to be targeted
+    i2c->DR = devAddr;
+    uint32_t timeout = I2C_TIMEOUT_TIME;
+    while(!(i2c->SR1 & I2C_SR1_ADDR) && timeout--);
+    (void)i2c->SR2; // Clear address reg
+    if(!timeout) {
+        return I2C_TIMEOUT;
+    }
+
+    if (i2c->SR1 & I2C_SR1_AF) { // NACK received, return
+        i2c->SR1 &= ~I2C_SR1_AF; // clear flag
+        i2cStop(i2c);
+        return I2C_NACK; 
+    }
+    
+    // Send register address of device
+    i2c->DR = regAddr;
+    timeout = I2C_TIMEOUT_TIME;
+    while (!(i2c->SR1 & I2C_SR1_BTF) && timeout--);
+    if(!timeout) {
+        return I2C_TIMEOUT;
+    }
+
+    // Send data
+    i2c->DR = data;
+    timeout = I2C_TIMEOUT_TIME;
+    while (!(i2c->SR1 & I2C_SR1_BTF) && timeout--);
+    if(!timeout) {
+        return I2C_TIMEOUT;
+    }
+
+    // Stop connection
+    i2cStop(i2c);
+
+    return I2C_OK;
+}
+
+I2CResult i2cWriteRaw(I2C_TypeDef *i2c, uint8_t devAddr, uint8_t data) {
+    i2cStart(i2c);
+ 
+    // Send device address to be targeted
+    i2c->DR = devAddr;
+    uint32_t timeout = I2C_TIMEOUT_TIME;
+    while(!(i2c->SR1 & I2C_SR1_ADDR) && timeout--);
+    (void)i2c->SR2; // Clear address reg
+    if(!timeout) {
+        return I2C_TIMEOUT;
+    }
+
+    if (i2c->SR1 & I2C_SR1_AF) { // NACK received, return
+        i2c->SR1 &= ~I2C_SR1_AF; // clear flag
+        i2cStop(i2c);
+        return I2C_NACK; 
+    }
+
+    // Send data
+    i2c->DR = data;
+    timeout = I2C_TIMEOUT_TIME;
+    while(!(i2c->SR1 & I2C_SR1_BTF) && timeout--);
+    if(!timeout) {
+        return I2C_TIMEOUT;
+    }
+
+    i2cStop(i2c);
+
+    return I2C_OK;
+}
+
+I2CResult i2cWriteBytes(I2C_TypeDef *i2c, uint8_t devAddr, uint8_t *data, uint16_t n) {
+    i2cStart(i2c);
+
+    // Send device address to be targeted
+    i2c->DR = devAddr;
+    uint32_t timeout = I2C_TIMEOUT;
+    while(!(i2c->SR1 & I2C_SR1_ADDR) && timeout--);
+    (void)i2c->SR2; // Clear address reg
+    if(!timeout) {
+        return I2C_TIMEOUT;
+    }
+    
+    if (i2c->SR1 & I2C_SR1_AF) { // NACK received, return
+        i2c->SR1 &= ~I2C_SR1_AF; // clear flag
+        i2cStop(i2c);
+        return I2C_NACK; 
+    }
+
+    for(int i = 0; i < n; i++) {
+        // Send data
+        i2c->DR = data[i];
+        int timeout = I2C_TIMEOUT_TIME;
+        while(!(i2c->SR1 & I2C_SR1_BTF) && timeout--);
+        if(!timeout) {
+            return I2C_TIMEOUT;
+        }
+    }
+
+    i2cStop(i2c);
+
+    return I2C_OK;
+}
+
