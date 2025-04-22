@@ -54,6 +54,13 @@ void gpioSetPull(Pin pin, PinPullMode pullMode) {
     pin.port->PUPDR |= (pullMode << (pin.pin*2));
 }
 
+void gpioSetOutputType(Pin pin, OutputType otype) {
+    // Clear bit
+    pin.port->OTYPER &= ~(1 << pin.pin);
+    // Set bit
+    pin.port->OTYPER |= (otype << pin.pin);
+}
+
 PinState gpioDigitalRead(Pin pin) {
     if((pin.port->IDR) & (1<<pin.pin)) {
         return HIGH;

@@ -398,10 +398,17 @@ typedef enum {
     REVERSED =  0x03
 } PinPullMode;
 
+// Typedef for pin output types
+typedef enum {
+    PUSH_PULL  = 0x00,
+    OPEN_DRAIN = 0x01
+} OutputType;
+
 void gpioInit(GPIO_TypeDef *gpio);
 void gpioInitAll(void);
 void gpioPinMode(Pin pin, PinMode mode);
 void gpioSetAlternateFunction(Pin pin, AlternateFunction af);
+void gpioSetOutputType(Pin pin, OutputType otype);
 void gpioWrite(Pin pin, PinState value);
 void gpioSetPull(Pin pin, PinPullMode pull);
 PinState gpioDigitalRead(Pin pin);

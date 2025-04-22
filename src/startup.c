@@ -15,7 +15,7 @@ __attribute__((naked, noreturn)) void _reset(void) {
     while(1) (void) 0;  
 }
 
-extern void _estack(void);  // Defined in link.ld
+extern void _estack(void);  // Defined in linker.ld
 
 // 16 standard and 42 nRF-specific handlers
 __attribute__((section(".vectors"))) void (*const tab[16 + 42])(void) = {
