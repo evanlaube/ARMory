@@ -401,6 +401,7 @@ typedef enum {
 void gpioInit(GPIO_TypeDef *gpio);
 void gpioInitAll(void);
 void gpioPinMode(Pin pin, PinMode mode);
+void gpioSetAlternateFunction(Pin pin, AlternateFunction af);
 void gpioWrite(Pin pin, PinState value);
 void gpioSetPull(Pin pin, PinPullMode pull);
 PinState gpioDigitalRead(Pin pin);
