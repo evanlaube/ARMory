@@ -31,6 +31,11 @@
 #define RCC_PLLI2SCFGR_OFFSET  0x84
 #define RCC_DCKCFGR_OFFSET     0x8c
 
+// Bit definitions for enabling differnet i2cs
+#define RCC_APB1ENR_I2C1EN     (1U << 21)
+#define RCC_APB1ENR_I2C2EN     (1U << 22)
+#define RCC_APB1ENR_I2C3EN     (1U << 23)
+
 // Typdef for easy access to RCC registers
 typedef struct {
     volatile uint32_t CR;             // 0x00

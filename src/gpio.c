@@ -34,6 +34,11 @@ void gpioPinMode(Pin pin, PinMode mode) {
     pin.port->MODER |= (mode << (pin.pin * 2)); 
 }
 
+void gpioSetAlternateFunction(Pin pin, AlternateFunction af) {
+    pin.port->AFR[pin.pin / 8] &= ~(0xF << ((pin.pin % 8) * 4)); // clear
+    pin.port->AFR[pin.pin / 8] |=  (af  << ((pin.pin % 8) * 4)); // set
+}
+
 void gpioWrite(Pin pin, PinState value) {
     if (value == HIGH) {
         pin.port->BSRR = PIN_MASK(pin.pin); // Set the pin high
@@ -169,8 +174,7 @@ void pwmInitPin(Pin pin) {
     gpioPinMode(pin, ALTERNATE_FUNC); 
     
     // Set which alternate function to use for the pin
-    pin.port->AFR[pin.pin / 8] &= ~(0xF << ((pin.pin % 8) * 4)); // clear
-    pin.port->AFR[pin.pin / 8] |=  (map->af  << ((pin.pin % 8) * 4)); // set
+    gpioSetAlternateFunction(pin, map->af);
                                                                       //
     // Initialize timer attached to pin
     pwmInitTimer(map->timer, map->channel);
