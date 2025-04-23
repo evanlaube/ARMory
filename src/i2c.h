@@ -74,14 +74,22 @@ typedef enum {
 } I2CResult;
 
 const I2CMap *getI2CMap(I2C_TypeDef *i2c);
+
 void i2cInit(I2C_TypeDef *i2c);
 void i2cStart(I2C_TypeDef *i2c);
 void i2cStop(I2C_TypeDef *i2c);
-void i2cSendAddr(I2C_TypeDef *i2c, uint8_t addr, bool read);
+
+I2CResult i2cSendAddr(I2C_TypeDef *i2c, uint8_t addr, bool read);
+I2CResult i2cSendData(I2C_TypeDef *i2c, uint8_t data);
+
 I2CResult i2cWriteByte(I2C_TypeDef *i2c, uint8_t devAddr, uint8_t regAddr, uint8_t data);
 I2CResult i2cWriteRaw(I2C_TypeDef *i2c, uint8_t devAddr, uint8_t data);
 I2CResult i2cWriteBytes(I2C_TypeDef *i2c, uint8_t devAddr, uint8_t *data, uint16_t n);
-void i2cReadByte(I2C_TypeDef *i2c, bool ack);
+
+I2CResult i2cReadByte(I2C_TypeDef *i2c, uint8_t devAddr, uint8_t regAddr, uint8_t *data);
+I2CResult i2cReadRaw(I2C_TypeDef *i2c, uint8_t devAddr, uint8_t *data);
+I2CResult i2cReadBytes(I2C_TypeDef *i2c, uint8_t devAddr, uint8_t regAddr, uint8_t *buffer, uint16_t len);
+I2CResult i2cReadRawBytes(I2C_TypeDef *i2c, uint8_t devAddr, uint8_t *buffer, uint16_t len);
 
 
 #endif // !I2C_H
