@@ -101,6 +101,13 @@ PinState gpioDigitalRead(Pin pin) {
 void adcInit(void) {
     // Enable ADC1 clock
     RCC->APB2ENR |= (1 << 8);
+
+        // Set ADC prescaler: APB2 / 4 = 21 MHz
+    ADC_CCR &= ~(0b11 << 16);           // Clear prescaler bits
+    ADC_CCR |=  (0b01 << 16);           // DIV4 (0b01)
+
+    // Set sample time to maximum (480 cycles) for all channels
+    ADC1->SMPR2 = 0xFFFFFFFF;
 }
 
 AdcChannel gpioToAdcChannel(Pin pin) {

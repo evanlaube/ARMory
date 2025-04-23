@@ -224,6 +224,10 @@ typedef struct {
 #define ADC_SR_STRT        (1U << 4)  // Regular channel start flag
 #define ADC_SR_OVR         (1U << 5)  // Overrun flag
 
+// ADC Common abse address
+#define ADC_COMMON_BASE 0x40012300
+#define ADC_CCR (*(volatile uint32_t *)(ADC_COMMON_BASE + 0x04))
+
 // ADC1 base address 
 #define ADC1_BASE 0x40012000
 
