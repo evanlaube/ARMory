@@ -33,6 +33,7 @@ $(BIN): $(ELF)
 flash: $(BIN)
 	$(info ===============     Compiling Binary     ===============)
 	$(STFLASH) write $< 0x8000000
+	$(STFLASH) reset
 
 clean:
 	rm -rf $(BUILD_DIR)

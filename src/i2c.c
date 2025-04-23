@@ -45,7 +45,7 @@ void i2cInit(I2C_TypeDef *i2c) {
 
     // Set i2c clock for fast mode
     i2c->CR2 = 42;          // PCLK1 = 42 MHz
-    i2c->CCR = (1 << 15) | (1 << 14) | 12;  // FAST=1, DUTY=0, CCR=35 -> 400kHz
+    i2c->CCR = (1 << 15) | (0 << 14) | 30;  // FAST=1, DUTY=1, CCR=52 -> 400kHz
     i2c->TRISE = 30;
     
 
