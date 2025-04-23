@@ -36,6 +36,27 @@
 #define RCC_APB1ENR_I2C2EN     (1U << 22)
 #define RCC_APB1ENR_I2C3EN     (1U << 23)
 
+// RCC_CR
+#define RCC_CR_HSEON            (1 << 16)
+#define RCC_CR_HSERDY           (1 << 17)
+#define RCC_CR_PLLON            (1 << 24)
+#define RCC_CR_PLLRDY           (1 << 25)
+
+// RCC_PLLCFGR positions
+#define RCC_PLLCFGR_PLLM_Pos    0
+#define RCC_PLLCFGR_PLLN_Pos    6
+#define RCC_PLLCFGR_PLLP_Pos    16
+#define RCC_PLLCFGR_PLLSRC_HSE  (1 << 22)
+
+// RCC_CFGR
+#define RCC_CFGR_SW_PLL         (0b10 << 0)
+#define RCC_CFGR_SWS_PLL        (0b10 << 2)
+#define RCC_CFGR_SWS_Msk        (0b11 << 2)
+
+#define RCC_CFGR_HPRE_DIV1      (0b0000 << 4)
+#define RCC_CFGR_PPRE1_DIV2     (0b100 << 10)
+#define RCC_CFGR_PPRE2_DIV1     (0b000 << 13)
+
 // Typdef for easy access to RCC registers
 typedef struct {
     volatile uint32_t CR;             // 0x00
@@ -72,6 +93,27 @@ typedef struct {
 
 // Define RCC at base offset of RCC
 #define RCC ((RCC_TypeDef *) RCC_BASE)
+
+// FLASH_ACR
+#define FLASH_ACR_LATENCY_2WS   (2 << 0)
+#define FLASH_ACR_PRFTEN        (1 << 8)
+#define FLASH_ACR_ICEN          (1 << 9)
+#define FLASH_ACR_DCEN          (1 << 10)
+
+// FLASH base
+#define FLASH_BASE      (0x40023C00UL)
+
+// Register layout for FLASH
+typedef struct {
+    volatile uint32_t ACR;
+    volatile uint32_t KEYR;
+    volatile uint32_t OPTKEYR;
+    volatile uint32_t SR;
+    volatile uint32_t CR;
+    volatile uint32_t OPTCR;
+} FLASH_TypeDef;
+
+#define FLASH ((FLASH_TypeDef *) FLASH_BASE)
 
 // Define General Purpose Input/Output (GPIO) base addresses
 #define GPIOA_BASE 0x40020000
@@ -403,6 +445,8 @@ typedef enum {
     PUSH_PULL  = 0x00,
     OPEN_DRAIN = 0x01
 } OutputType;
+
+void rccInit(void);
 
 void gpioInit(GPIO_TypeDef *gpio);
 void gpioInitAll(void);

@@ -44,9 +44,10 @@ void i2cInit(I2C_TypeDef *i2c) {
     i2c->CR1 = 0;
 
     // Set i2c clock
-    i2c->CR2 |= (10 << 0); // Hard code to 10 MHz for now
-    i2c->CCR |= (50 << 0); // Set i2c Clock to 100 kHz
-    i2c->TRISE |= (11<<0); 
+    i2c->CR2 = 42;          // PCLK1 = 42 MHz
+    i2c->CCR = 105;         // 42 MHz / (2 * 200kHz) = 105 → ~200kHz
+    i2c->TRISE = 43;        // (1000ns / (1 / 42MHz)) + 1 = 43
+    
 
     // Enable i2c peripheral
     i2c->CR1 |= I2C_CR1_PE;
@@ -154,6 +155,10 @@ I2CResult i2cWriteRaw(I2C_TypeDef *i2c, uint8_t devAddr, uint8_t data) {
 }
 
 I2CResult i2cWriteBytes(I2C_TypeDef *i2c, uint8_t devAddr, uint8_t *data, uint16_t n) {
+    if (!data || n == 0) {
+        return I2C_ERROR;
+    }
+
     i2cStart(i2c);
 
     // Send device address to be targeted

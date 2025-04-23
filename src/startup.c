@@ -1,4 +1,6 @@
 
+#include "gpio.h"
+
 int main(void);
 
 // Startup code
@@ -11,6 +13,7 @@ __attribute__((naked, noreturn)) void _reset(void) {
     for (long *dst = &_sbss; dst < &_ebss; dst++) *dst = 0;
     for (long *dst = &_sdata, *src = &_sidata; dst < &_edata;) *dst++ = *src++;
 
+    //rccInit();
     main();             
     while(1) (void) 0;  
 }

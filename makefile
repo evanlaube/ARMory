@@ -11,7 +11,7 @@ STFLASH = st-flash
 C_SOURCES = $(wildcard $(SRC_DIR)/*.c) 
 LD_SCRIPT = linker.ld
 
-CFLAGS = -mcpu=cortex-m4 -mthumb -Wall -nostdlib -nostartfiles -O0
+CFLAGS = -mcpu=cortex-m4 -mthumb -Wall -nostdlib -nostartfiles -O0 -g
 CFLAGS += -I$(shell arm-none-eabi-gcc -print-file-name=include)
 CFLAGS += -I$(shell arm-none-eabi-gcc -print-file-name=include-fixed)
 LDFLAGS = -T$(LD_SCRIPT)

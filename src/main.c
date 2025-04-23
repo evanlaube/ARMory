@@ -1,5 +1,8 @@
 
 #include "gpio.h"
+#include "i2c.h"
+
+#define SH1106_ADDR 0x3C  // 7-bit I2C address
 
 #define RED_LED     A8
 #define GREEN_LED   A9
@@ -52,7 +55,70 @@ void readJoystick(void) {
     joystickPressed = !gpioDigitalRead(JOY_SW); // active low
 }
 
+void oledInit(I2C_TypeDef *i2c) {
+    uint8_t init[] = {
+        0x00,       // Control byte for commands
+        0xAE,       // Display OFF
+        0xA1,       // Segment remap (optional)
+        0xC8,       // COM scan direction: remapped
+        0xA8, 0x3F, // Multiplex ratio (1/64)
+        0xD3, 0x00, // Display offset
+        0x40,       // Display start line
+        0xA6,       // Normal display
+        0xA4,       // Entire display ON from RAM
+        0xD5, 0x80, // Display clock
+        0xD9, 0xF1, // Pre-charge
+        0xDA, 0x12, // COM pins
+        0xDB, 0x40, // VCOM detect
+        0x8D, 0x14, // Charge pump
+        0xAF        // Display ON
+    };
+    i2cWriteBytes(i2c, SH1106_ADDR, init, sizeof(init));
+}
+
+void oledFillStripes(I2C_TypeDef *i2c) {
+    for (uint8_t page = 0; page < 8; page++) {
+        uint8_t setPage[] = {
+            0x00,
+            (uint8_t)(0xB0 | page),     // Set page address
+            0x00,                       // Set lower column
+            0x10                        // Set higher column
+        };
+        i2cWriteBytes(i2c, SH1106_ADDR, setPage, sizeof(setPage));
+
+        // Each page is 128 columns wide
+        uint8_t buffer[129];
+        buffer[0] = 0x40; // Control byte for data
+        for (int i = 1; i < 129; i++) {
+            buffer[i] = (i % 2) ? 0xAA : 0x55;
+        }
+        i2cWriteBytes(i2c, SH1106_ADDR, buffer, sizeof(buffer));
+    }
+}
+
+void oledClear(I2C_TypeDef *i2c) {
+    uint8_t clear[132];
+    for (uint8_t page = 0; page < 8; page++) {
+        uint8_t setPage[] = {
+            0x00,
+            (uint8_t)(0xB0 | page),
+            0x00, // low col
+            0x10  // high col
+        };
+        i2cWriteBytes(i2c, SH1106_ADDR, setPage, sizeof(setPage));
+
+        clear[0] = 0x40; // Control byte for data
+        for (int i = 1; i < 132; i++) clear[i] = 0x00;
+
+        i2cWriteBytes(i2c, SH1106_ADDR, clear, sizeof(clear));
+    }
+}
+
 int main() {
+    i2cInit(I2C1);
+    oledInit(I2C1);
+    oledClear(I2C1);
+    oledFillStripes(I2C1);
     gpioInitAll();
     adcInit();
 
