@@ -26,6 +26,10 @@ SECTIONS {
     _ebss = .;              
   } > sram
 
+  _sstack = .;
+  . = . + 0x1000;  /* 4 KB stack */
+  _estack = .;
+
   . = ALIGN(8);
   _end = .;     
 }
