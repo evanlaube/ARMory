@@ -1,7 +1,7 @@
 
-#include "gpio.h"
-#include "i2c.h"
-#include "timing.h"
+#include "armory/gpio.h"
+#include "armory/i2c.h"
+#include "armory/timing.h"
 #include <stdint.h>
 
 #define SH1106_ADDR 0x3C  // 7-bit I2C address

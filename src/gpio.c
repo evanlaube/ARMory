@@ -1,5 +1,5 @@
 
-#include "gpio.h"
+#include "armory/gpio.h"
 
 void rccInit(void) {
     // Enable HSE

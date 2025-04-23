@@ -1,5 +1,5 @@
 
-#include "gpio.h"
+#include "armory/gpio.h"
 
 int main(void);
 

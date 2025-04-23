@@ -1,6 +1,6 @@
 
-#include "i2c.h"
-#include "gpio.h"
+#include "armory/i2c.h"
+#include "armory/gpio.h"
 
 const I2CMap *getI2CMap(I2C_TypeDef *i2c) {
     for(int i = 0; i < sizeof(i2cPinMap) / sizeof(I2CMap); i++) {

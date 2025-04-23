@@ -1,5 +1,2 @@
 -std=c99
--Isrc
--Iexamples/breakout
--I/path/to/CMSIS/Include
--I/path/to/STM32F4xx_HAL_Driver/Inc
+-Iinclude/

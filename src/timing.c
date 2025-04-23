@@ -1,5 +1,5 @@
 
-#include "timing.h"
+#include "armory/timing.h"
 #include <stdint.h>
 
 void delay_ms(uint32_t ms) {
