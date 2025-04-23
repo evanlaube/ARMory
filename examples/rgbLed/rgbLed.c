@@ -36,8 +36,6 @@ int main(void) {
     
     // Software debounce button (kind of)
     uint16_t buttonWait = 1000;
-    uint16_t potValue = 4095;
-    uint8_t potValueScaled;
     while(1) {
         uint16_t potValue = adcReadPin(POT_PIN); // 0–4095
         if(potValue < 24) {

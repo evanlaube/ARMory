@@ -234,8 +234,10 @@ I2CResult i2cReadRaw(I2C_TypeDef *i2c, uint8_t devAddr, uint8_t *data) {
 
 I2CResult i2cReadBytes(I2C_TypeDef *i2c, uint8_t devAddr, uint8_t regAddr, uint8_t *buffer, uint16_t len) {
     // Todo
+    return I2C_ERROR;
 }
 
 I2CResult i2cReadRawBytes(I2C_TypeDef *i2c, uint8_t devAddr, uint8_t *buffer, uint16_t len) {
     // Todo
+    return I2C_ERROR;
 }
