@@ -1,3 +1,5 @@
+SHELL := /bin/zsh
+
 # Toolchain
 CC       = arm-none-eabi-gcc
 OBJCOPY  = arm-none-eabi-objcopy
@@ -77,10 +79,12 @@ $(foreach ex,$(EXAMPLES),$(eval $(call EXAMPLE_template,$(ex))))
 
 # Flash a selected example
 .PHONY: flash
-flash:
+flash: $(BUILD_DIR)/$(EXAMPLE).bin
 	@if [ -z "$(EXAMPLE)" ]; then echo "Set EXAMPLE=name to flash."; exit 1; fi
 	$(ECHO) "[FLASH]    $(CYAN)Flashing $(EXAMPLE) with ST-Link$(RESET)"
 	$(STFLASH) write $(BUILD_DIR)/$(EXAMPLE).bin 0x8000000
+	$(ECHO) "[FLASH]    $(CYAN) Resetting board $(RESET)"
+	$(STFLASH) reset
 
 # Clean all build artifacts
 .PHONY: clean
