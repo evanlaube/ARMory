@@ -13,7 +13,7 @@ __attribute__((naked, noreturn)) void _reset(void) {
     for (long *dst = &_sbss; dst < &_ebss; dst++) *dst = 0;
     for (long *dst = &_sdata, *src = &_sidata; dst < &_edata;) *dst++ = *src++;
 
-    //rccInit();
+    rccInit();
     main();             
     while(1) (void) 0;  
 }

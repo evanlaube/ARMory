@@ -43,10 +43,10 @@ void i2cInit(I2C_TypeDef *i2c) {
     i2c->CR1 = I2C_CR1_SWRST;
     i2c->CR1 = 0;
 
-    // Set i2c clock
+    // Set i2c clock for fast mode
     i2c->CR2 = 42;          // PCLK1 = 42 MHz
-    i2c->CCR = 105;         // 42 MHz / (2 * 200kHz) = 105 → ~200kHz
-    i2c->TRISE = 43;        // (1000ns / (1 / 42MHz)) + 1 = 43
+    i2c->CCR = (1 << 15) | (1 << 14) | 12;  // FAST=1, DUTY=0, CCR=35 -> 400kHz
+    i2c->TRISE = 30;
     
 
     // Enable i2c peripheral

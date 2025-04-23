@@ -114,6 +114,10 @@ void oledClear(I2C_TypeDef *i2c) {
     }
 }
 
+void delay(volatile int count) {
+    while(count-- > 0);
+}
+
 int main() {
     i2cInit(I2C1);
     oledInit(I2C1);
@@ -135,14 +139,20 @@ int main() {
     gpioSetPull(JOY_SW, PULL_UP);
 
     while(1) {
-        readJoystick();
-        gpioWrite(GREEN_LED, joystickPressed);
-
-        uint8_t redBrightness  = absVal(deltaX);
-        uint8_t blueBrightness = absVal(deltaY);
-
-        pwmWrite(RED_LED, redBrightness);
-        pwmWrite(BLUE_LED, blueBrightness);
+        gpioWrite(GREEN_LED, HIGH);
+        delay(1000000);
+        gpioWrite(GREEN_LED, LOW);
     }
+
+    //while(1) {
+    //    readJoystick();
+    //    gpioWrite(GREEN_LED, joystickPressed);
+
+    //    uint8_t redBrightness  = absVal(deltaX);
+    //    uint8_t blueBrightness = absVal(deltaY);
+
+    //    pwmWrite(RED_LED, redBrightness);
+    //    pwmWrite(BLUE_LED, blueBrightness);
+    //}
     
 }

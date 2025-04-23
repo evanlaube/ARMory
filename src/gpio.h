@@ -43,15 +43,15 @@
 #define RCC_CR_PLLRDY           (1 << 25)
 
 // RCC_PLLCFGR positions
-#define RCC_PLLCFGR_PLLM_Pos    0
-#define RCC_PLLCFGR_PLLN_Pos    6
-#define RCC_PLLCFGR_PLLP_Pos    16
+#define RCC_PLLCFGR_PLLM_POS    0
+#define RCC_PLLCFGR_PLLN_POS    6
+#define RCC_PLLCFGR_PLLP_POS    16
 #define RCC_PLLCFGR_PLLSRC_HSE  (1 << 22)
 
 // RCC_CFGR
 #define RCC_CFGR_SW_PLL         (0b10 << 0)
 #define RCC_CFGR_SWS_PLL        (0b10 << 2)
-#define RCC_CFGR_SWS_Msk        (0b11 << 2)
+#define RCC_CFGR_SWS_MSK        (0b11 << 2)
 
 #define RCC_CFGR_HPRE_DIV1      (0b0000 << 4)
 #define RCC_CFGR_PPRE1_DIV2     (0b100 << 10)
