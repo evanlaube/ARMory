@@ -1,5 +1,7 @@
 
 #include <armory/gpio.h>
+#include <armory/adc.h>
+#include <armory/pwm.h>
 #include <stdint.h>
 #include "io.h"
 

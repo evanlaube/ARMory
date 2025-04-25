@@ -1,5 +1,7 @@
 
 #include <armory/gpio.h>
+#include <armory/pwm.h>
+#include <armory/adc.h>
 #include <armory/i2c.h>
 #include <armory/timing.h>
 #include <stdint.h>
