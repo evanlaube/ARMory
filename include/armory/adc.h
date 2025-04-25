@@ -78,10 +78,39 @@ typedef enum {
 // Define ADC1 at base offset of ADC1
 #define ADC1 ((ADC_TypeDef *)(ADC1_BASE))
 
+/**
+ * @brief Initializes ADC1 on the microcontroller.
+ *
+ * Enables ADC1 clock, sets the prescaler, and configures the sample time
+ * for ADC1.
+ *
+ * @note This must be called before calling any other ADC functions.
+ */
 void adcInit(void);
-AdcChannel gpioToAdcChannel(Pin pin);
-uint16_t adcReadChannel(AdcChannel channel);
-uint16_t adcReadPin(Pin pin);
 
+/**
+ * @brief Gets the AdcChannel to use for a given pin.
+ *
+ * @param pin The GPIO pin to map to an ADC channel. 
+ * @return The corresponding AdcChannel, or ADC_INVALID if unsupported
+ */
+AdcChannel gpioToAdcChannel(Pin pin);
+
+/**
+ * @brief Reads an analog value from a given AdcChannel.
+ *
+ * @return The value read from the channel (0 - 4095)
+ */
+uint16_t adcReadChannel(AdcChannel channel);
+
+/**
+ * @brief Reads an analog value from a supported analog pin.
+ *
+ * Converts the analog value on the given pin to a 12-bit digital value
+ * values 0 - 4095.
+ *
+ * @return The value read from the pin (0 - 4095)
+ */
+uint16_t adcReadPin(Pin pin);
 
 #endif // !ADC_H
