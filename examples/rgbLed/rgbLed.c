@@ -1,4 +1,6 @@
 #include "armory/gpio.h"
+#include "armory/adc.h"
+#include "armory/pwm.h"
 #define RED_LED B0
 #define GREEN_LED B1
 #define BLUE_LED A8

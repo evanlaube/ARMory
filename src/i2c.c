@@ -1,6 +1,7 @@
 
 #include "armory/i2c.h"
 #include "armory/gpio.h"
+#include "armory/rcc.h"
 
 const I2CMap *getI2CMap(I2C_TypeDef *i2c) {
     for(int i = 0; i < sizeof(i2cPinMap) / sizeof(I2CMap); i++) {
@@ -99,7 +100,6 @@ I2CResult i2cSendData(I2C_TypeDef *i2c, uint8_t data) {
     }
     return I2C_OK;
 }
-
 
 I2CResult i2cWriteByte(I2C_TypeDef *i2c, uint8_t devAddr, uint8_t regAddr, uint8_t data) {
     // Start the i2c connection
