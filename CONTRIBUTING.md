@@ -1,4 +1,4 @@
-# Contributing to ARMORY
+# 🛡️ Contributing to ARMORY
 
 Thank you for considering contributing to ARMory!
 
@@ -11,7 +11,7 @@ actively create a better HAL.
 >So yes, **please** open that pull request that fixes all the typos I've made 
 (there's probably a lot)
 
-## How To Contribute
+## 🛠️ How To Contribute
 To get started:
 
 1. **Fork the repository**
@@ -48,12 +48,12 @@ than spend hours trying to get it perfect
 8. **Success!**
    - Once your PR is merged in, you have officially made a contribution! Celebrate!
 
-## Code Guidelines
+## 📜 Code Guidelines
 
 To keep the ARMory codebase clean and consistent, please follow these general
 guidelines:
 
-### Formatting and Style
+### 🎨 Formatting and Style
 - **Use 4 spaces for indentation.** No tabs allowed :(
 
 - **Curly braces MUST go on their own lines** (controversial, sorry)
@@ -87,12 +87,12 @@ guidelines:
 
 - **Keep lines ~80-100 characters max, especially for register definitions and macros**
 
-### File Structure
+### 🗂️ File Structure
 - Header files should include guards (`#ifndef`, not `#pragma once`)
 - Group related functions by module (e.g. `gpio.c`, `i2c.c`)
 Keep hardware register definitions in headers, and implementation in `.c` files
 
-### Naming conventions
+### 🏷️ Naming conventions
 - Functions must use `snakeCase` prefixed with the module
   - `i2cInit`, `gpioWrite`, `pwmInitAll`, etc.
 
@@ -102,7 +102,7 @@ Keep hardware register definitions in headers, and implementation in `.c` files
 - Macro names and register flags are capitalized and use underscores 
   - `GPIOA_BASE`, `A15`, `ADC1_SR_OFFSET`
 
-### Comment Style
+### 💬 Comment Style
 - To keep lines short, prefer **full-line comments**
   - inline comments acceptable
 in some cases, as long as they do not make the line exceed 100+ characters
@@ -144,7 +144,7 @@ in some cases, as long as they do not make the line exceed 100+ characters
 
 - Use block comments in code for sections containing complicated algorithms.
 
-## Commit Message Style
+## 📝 Commit Message Style
 - Use a short, descriptive commit title in the format:
 ```
 [module] Short description of the change
@@ -169,7 +169,7 @@ instead of returning a proper error code
 > Tip: Think of a commit message as completing the following sentence: \
 "When applied, this commit will [your message]."
 
-## Testing
+## 🧪 Testing
 As of now, and for the foreseeable future, no official tests are active for 
 ARMory. Therefore, the `examples/` directory acts as the best way to test new
 features. 
