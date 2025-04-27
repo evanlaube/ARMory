@@ -10,8 +10,10 @@
 #define I2C_TIMEOUT_TIME 10000
 
 #define I2C_CR1_PE    ( 1 <<  0 )
+#define I2C_SR1_RXNE  ( 1 <<  6 )
 #define I2C_CR1_START ( 1 <<  8 )
 #define I2C_CR1_STOP  ( 1 <<  9 )
+#define I2C_CR1_ACK   ( 1 << 10 )
 #define I2C_CR1_SWRST ( 1 << 15 )
 
 #define I2C_SR1_SB    ( 1 <<  0 )

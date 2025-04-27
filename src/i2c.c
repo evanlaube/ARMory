@@ -232,12 +232,89 @@ I2CResult i2cReadRaw(I2C_TypeDef *i2c, uint8_t devAddr, uint8_t *data) {
     return I2C_OK;
 }
 
+uint8_t i2cReceiveData(I2C_TypeDef *i2c, bool ack) {
+    // Set ACK/NACK bit
+    if(ack) {
+        i2c->CR1 |= I2C_CR1_ACK;
+    } else {
+        i2c->CR1 &= ~I2C_CR1_ACK;
+    }
+
+    // Wait until the data register is  not empty
+    while (!(i2c->SR1 & I2C_SR1_RXNE));
+
+    // Return the data register
+    return (uint8_t) i2c->DR;
+}
+
 I2CResult i2cReadBytes(I2C_TypeDef *i2c, uint8_t devAddr, uint8_t regAddr, uint8_t *buffer, uint16_t len) {
-    // Todo
-    return I2C_ERROR;
+    i2cStart(i2c);
+
+    // Send device address with write bit
+    I2CResult res = i2cSendAddr(i2c, devAddr, 0);
+    if(res != I2C_OK) {
+        i2cStop(i2c);
+        return res;
+    }
+
+    // Send register address 
+    res = i2cSendData(i2c, regAddr);
+    if(res != I2C_OK) {
+        i2cStop(i2c);
+        return res;
+    }
+
+    // Restart i2c connection
+    i2cStop(i2c);
+    i2cStart(i2c);
+
+    // Send device address with read flag
+    res = i2cSendAddr(i2c, devAddr, 1);
+    if(res != I2C_OK) {
+        i2cStop(i2c);
+        return res;
+    }
+
+    // Receive bytes
+    for(uint16_t i = 0; i < len; i++) {
+        if(i == len-1) {
+            // Last byte, send NACK
+            buffer[i] = i2cReceiveData(i2c, false);
+        } else {
+            // Not last byte, send ACK
+            buffer[i] = i2cReceiveData(i2c, true);
+        }
+    }
+
+    // Stop the i2c connection
+    i2cStop(i2c);
+
+    return I2C_OK;
 }
 
 I2CResult i2cReadRawBytes(I2C_TypeDef *i2c, uint8_t devAddr, uint8_t *buffer, uint16_t len) {
-    // Todo
-    return I2C_ERROR;
+    i2cStart(i2c);
+
+    // Send the device address with the read flag
+    I2CResult res = i2cSendAddr(i2c, devAddr, 1);
+    if(res != I2C_OK) {
+        i2cStop(i2c);
+        return res;
+    }
+
+    // Receive bytes
+    for(uint16_t i = 0; i < len; i++) {
+        if(i == len-1) {
+            // Last byte, send NACK
+            buffer[i] = i2cReceiveData(i2c, false);
+        } else {
+            // Not last byte, send ACK
+            buffer[i] = i2cReceiveData(i2c, true);
+        }
+    }
+
+    // Stop the i2c connection
+    i2cStop(i2c);
+
+    return I2C_OK;
 }
