@@ -55,25 +55,34 @@ void i2cInit(I2C_TypeDef *i2c) {
 }
 
 void i2cStart(I2C_TypeDef *i2c) {
+    // Set the start bit in the control register
     i2c->CR1 |= I2C_CR1_START;
+    // Wait for the start bit to be set in the status register
     while(!(i2c->SR1 & I2C_SR1_SB));
 }
 
 void i2cStop(I2C_TypeDef *i2c) {
+    // Set the stop bit in the control register
     i2c->CR1 |= I2C_CR1_STOP;
+    // Wait until the busy bit is cleared in the status register
     while(i2c->SR2 & I2C_SR2_BUSY);
 }
 
 I2CResult i2cSendAddr(I2C_TypeDef *i2c, uint8_t addr, bool read) {
+    // Set the LSB to the read bit (1 = read, 0 = write)
     uint8_t fullAddr = (addr << 1) | (read ? 1 : 0);
+
+    // Write the full address to the i2c data register
     i2c->DR = fullAddr;
 
+    // Wait for the address to be sent, checking timeout
     uint16_t timeout = I2C_TIMEOUT_TIME;
     while (!(i2c->SR1 & I2C_SR1_ADDR) && timeout--);
     if (!timeout) {
         return I2C_TIMEOUT;
     }    
 
+    // Clear the ADDR flag by reading the status register
     (void)i2c->SR2;
 
     // Check for NACK
@@ -86,7 +95,10 @@ I2CResult i2cSendAddr(I2C_TypeDef *i2c, uint8_t addr, bool read) {
 }
 
 I2CResult i2cSendData(I2C_TypeDef *i2c, uint8_t data) {
+    // Write the data to the i2c data register
     i2c->DR = data;
+
+    // Wait for the data to be sent, checking timeout
     uint16_t timeout = I2C_TIMEOUT_TIME;
     while (!(i2c->SR1 & I2C_SR1_BTF) && timeout--);
     if(!timeout) {
@@ -98,6 +110,7 @@ I2CResult i2cSendData(I2C_TypeDef *i2c, uint8_t data) {
         i2c->SR1 &= ~I2C_SR1_AF;
         return I2C_NACK;
     }
+
     return I2C_OK;
 }
 
@@ -168,6 +181,7 @@ I2CResult i2cWriteBytes(I2C_TypeDef *i2c, uint8_t devAddr, uint8_t *data, uint16
         return res;
     }
 
+    // For each byte in data array
     for(int i = 0; i < n; i++) {
         // Send data
         res = i2cSendData(i2c, data[i]);
@@ -210,6 +224,7 @@ I2CResult i2cReadByte(I2C_TypeDef *i2c, uint8_t devAddr, uint8_t regAddr, uint8_
         return res;
     }
 
+    // Read data byte from data register
     *data = (uint8_t)i2c->DR;
 
     i2cStop(i2c);
@@ -226,6 +241,7 @@ I2CResult i2cReadRaw(I2C_TypeDef *i2c, uint8_t devAddr, uint8_t *data) {
         return res;
     }
 
+    // Read data byte from i2c data register
     *data = (uint8_t)i2c->DR;
 
     i2cStop(i2c);

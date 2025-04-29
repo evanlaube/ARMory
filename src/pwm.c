@@ -4,6 +4,9 @@
 #include "armory/tim.h"
 #include "armory/rcc.h"
 
+// NOTE: Most pins can be mapped to multiple PWM channels. These were chosen 
+// arbitrarily and are not set in stone, however, they were chosen to utilize
+// only timers 1-4 when all PWM pins are initialized.
 const PwmChannelMap pwmPinMap[] = {
     { A0,  TIM2, &TIM2->CCR1, CH1, AF1 },
     { A1,  TIM2, &TIM2->CCR2, CH2, AF1 },
