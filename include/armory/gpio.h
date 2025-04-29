@@ -156,17 +156,73 @@ typedef enum {
     OPEN_DRAIN = 0x01
 } OutputType;
 
-
+/**
+ * @brief Initialized a specific GPIO port.
+ *
+ * Enables the GPIO clock the the specified port.
+ *
+ * @param gpio Pointer to the GPIO port instance to initialize.
+ */
 void gpioInit(GPIO_TypeDef *gpio);
+
+/**
+ * @brief Initializes all GPIO ports.
+ *
+ */
 void gpioInitAll(void);
+
+/**
+ * @brief Sets the mode of a specific GPIO pin.
+ *
+ * @param pin The pin to set the mode for.
+ * @param mode The mode to set for the pin.
+ */
 void gpioPinMode(Pin pin, PinMode mode);
+
+/**
+ * @brief Sets the alternate function for a specific GPIO pin.
+ *
+ * @param pin The pin to set the alternate function for.
+ * @param af The alternate function to set for the pin.
+ *
+ * @note The pin's mode should be set to ALTERNATE_FUNC before calling this.
+ */
 void gpioSetAlternateFunction(Pin pin, AlternateFunction af);
+
+/*
+ * @brief Sets the output type for a specific GPIO pin.
+ *
+ * @param pin Th epin to set the output type for.
+ * @param otype The output type to set for the pin.
+ */
 void gpioSetOutputType(Pin pin, OutputType otype);
+
+/**
+ * @brief Writes a digital value to a specific GPIO pin.
+ *
+ * @param pin The pin to write to.
+ * @param value The value to write to the pin (HIGH/LOW).
+ *
+ * @note The pin's mode should be set to OUTPUT before calling this.
+ */
 void gpioWrite(Pin pin, PinState value);
+
+/**
+ * @brief Sets the pull mode for a specific GPIO pin.
+ *
+ * @param pin The pin to set the pull mode for.
+ * @param pull The pull mode to set for the pin.
+ *
+ */
 void gpioSetPull(Pin pin, PinPullMode pull);
+
+/**
+ * @brief Reads the digial value from a specific GPIO pin.
+ *
+ * @param pin The pin to read from.
+ *
+ * @note The pin's mode should be set to INPUT before calling this.
+ */
 PinState gpioDigitalRead(Pin pin);
-
-
-
 
 #endif // !GPIO_H

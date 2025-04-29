@@ -9,6 +9,7 @@ void gpioInit(GPIO_TypeDef *gpio) {
         return; // Invalid GPIO port
     }
 
+    // Enable the GPIO clock for the port.
     if(gpio == GPIOA) {
         RCC->AHB1ENR |= (1<<0);
     } else if(gpio == GPIOB) {
@@ -32,13 +33,17 @@ void gpioInitAll(void) {
 }
 
 void gpioPinMode(Pin pin, PinMode mode) {
+    // Clear bits in GPIOx_MODER at pin index
     pin.port->MODER &= ~(0b11 << (pin.pin * 2)); 
+    // Set bits to desired pin mode
     pin.port->MODER |= (mode << (pin.pin * 2)); 
 }
 
 void gpioSetAlternateFunction(Pin pin, AlternateFunction af) {
-    pin.port->AFR[pin.pin / 8] &= ~(0xF << ((pin.pin % 8) * 4)); // clear
-    pin.port->AFR[pin.pin / 8] |=  (af  << ((pin.pin % 8) * 4)); // set
+    // Clear bits in GPIOx_AFRL and GPIOx_AFRH at pin index
+    pin.port->AFR[pin.pin / 8] &= ~(0xF << ((pin.pin % 8) * 4)); 
+    // Set bits to desired alternate function
+    pin.port->AFR[pin.pin / 8] |=  (af  << ((pin.pin % 8) * 4)); 
 }
 
 void gpioWrite(Pin pin, PinState value) {
@@ -52,21 +57,23 @@ void gpioWrite(Pin pin, PinState value) {
 void gpioSetPull(Pin pin, PinPullMode pullMode) {
     // Clear bits in GPIOx_PUPDR at pin index
     pin.port->PUPDR &= ~(0b11 << (pin.pin*2));
-    // Set bits to desired pinmode
+    // Set bits to desired pull mode 
     pin.port->PUPDR |= (pullMode << (pin.pin*2));
 }
 
 void gpioSetOutputType(Pin pin, OutputType otype) {
-    // Clear bit
+    // Clear bits in GPIOx_OTYPER at pin index
     pin.port->OTYPER &= ~(1 << pin.pin);
-    // Set bit
+    // Set bits to desired output type
     pin.port->OTYPER |= (otype << pin.pin);
 }
 
 PinState gpioDigitalRead(Pin pin) {
+    // Check if pin is driven high in the input data register
     if((pin.port->IDR) & (1<<pin.pin)) {
         return HIGH;
     }
+
     return LOW;
 }
 
