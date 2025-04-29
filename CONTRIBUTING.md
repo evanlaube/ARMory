@@ -1,4 +1,4 @@
-# 🛡️ Contributing to ARMORY
+# 🛡️ Contributing to ARMory
 
 Thank you for considering contributing to ARMory!
 
@@ -56,15 +56,15 @@ guidelines:
 ### 🎨 Formatting and Style
 - **Use 4 spaces for indentation.** No tabs allowed :(
 
-- **Curly braces MUST go on their own lines** (controversial, sorry)
+- **Opening curly braces NEVER go on their own lines** (controversial, sorry)
     ```C
     // DO THIS:
-    if (condition) {
+    if(condition) {
         doSomething();
     }
 
     // NEVER THIS:
-    if (condition)
+    if(condition)
     {
         doSomethingIncorrectly();
     }
@@ -93,7 +93,7 @@ guidelines:
 Keep hardware register definitions in headers, and implementation in `.c` files
 
 ### 🏷️ Naming conventions
-- Functions must use `snakeCase` prefixed with the module
+- Functions must use `camelCase` prefixed with the module
   - `i2cInit`, `gpioWrite`, `pwmInitAll`, etc.
 
 - Enums and typedefs use `PascalCase`
@@ -111,7 +111,7 @@ in some cases, as long as they do not make the line exceed 100+ characters
     // Example:
     
     // Function to fill an array with alternating 1's and 0's
-    int func(int length, int *arr) {
+    void func(int length, int *arr) {
         // Iterate `length` times
         for(int i = 0; i < length; i++) {
             // Insert i % 2 to the array at the i'th position
