@@ -93,6 +93,15 @@ typedef struct {
 // Define RCC at base offset of RCC
 #define RCC ((RCC_TypeDef *) RCC_BASE)
 
+/**
+ * @brief Initialize the Reset and Clock Control peripheral.
+ *
+ * Enables the High-Speed External oscillator, and configures the Phase-Locked
+ * Loop to use the HSE as the clock source. Sets the system clock to 84 MHz and
+ * configures AHB and APB prescalers.
+ *
+ * @note This function should be called in the system initialization phase
+ */
 void rccInit(void);
 
 #endif // !RCC_H
