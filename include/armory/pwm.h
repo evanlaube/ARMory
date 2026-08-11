@@ -53,6 +53,19 @@ void pwmInitTimer(TIM_TypeDef *timer, TimerChannel channel);
 void pwmWrite(Pin pin, uint8_t dutyCycle);
 
 /**
+ * @brief Writes a PWM duty cycle directly to a resolved PwmChannelMap.
+ *
+ * Writes the specified duty cycle (8 bit) straight to the map's CCR register,
+ * skipping the pin-to-channel lookup. Use this on hot paths by resolving the
+ * map once with getPwmMap() and reusing it, instead of calling pwmWrite() (which
+ * scans the pin map on every call).
+ *
+ * @param map The PwmChannelMap to write to. No-op if NULL.
+ * @param dutyCycle The duty cycle to write (0-255).
+ */
+void pwmWriteMap(const PwmChannelMap *map, uint8_t dutyCycle);
+
+/**
  * @brief Gets the PwmChannelMap for a given pin.
  *
  * Searches the pwmPinMap for the given pin, and returns a pointer to the
