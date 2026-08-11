@@ -180,15 +180,17 @@ int main() {
         if(ballY <= 0) {
             velY *= -1;
         } else if(ballY >= SH1106_HEIGHT-BALL_SIZE) {
+            // Resolve the LED's PWM channel once up front for writes
+            const PwmChannelMap *redLed = getPwmMap(RED_LED);
             for(int i = 0; i < 3; i++) {
                 int n = 0;
                 while(n < 255) {
-                    pwmWrite(RED_LED, n++);
+                    pwmWriteMap(redLed, n++);
                     delay_ms(1);
                 }
 
                 while(n > 0) {
-                    pwmWrite(RED_LED, --n);
+                    pwmWriteMap(redLed, --n);
                     delay_ms(1);
                 }
 

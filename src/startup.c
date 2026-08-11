@@ -20,7 +20,7 @@ __attribute__((naked, noreturn)) void _reset(void) {
 
 extern void _estack(void);  // Defined in linker.ld
 
-// 16 standard and 42 nRF-specific handlers
-__attribute__((section(".vectors"))) void (*const tab[16 + 42])(void) = {
+// 16 Cortex-M4 system exceptions and 86 STM32F411 peripheral IRQs
+__attribute__((section(".vectors"))) void (*const tab[16 + 86])(void) = {
     _estack, _reset
 };

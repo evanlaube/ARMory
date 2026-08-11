@@ -117,9 +117,12 @@ void pwmInitPin(Pin pin) {
     pwmInitTimer(map->timer, map->channel);
 }
 
-void pwmWrite(Pin pin, uint8_t dutyCycle) {
-    const PwmChannelMap *map = getPwmMap(pin);
-    // Return if the pin is not PWM available
+void pwmWriteMap(const PwmChannelMap *map, uint8_t dutyCycle) {
+    // Return if the map is invalid (e.g. the pin is not PWM available)
     if(!map) return;
     *(map->ccr) = dutyCycle;
+}
+
+void pwmWrite(Pin pin, uint8_t dutyCycle) {
+    pwmWriteMap(getPwmMap(pin), dutyCycle);
 }
