@@ -12,9 +12,10 @@ void adcInit(void) {
     ADC_CCR &= ~(0b11 << 16);           // Clear prescaler bits
     ADC_CCR |=  (0b01 << 16);           // DIV4 (0b01)
 
-    // Set sample time to 84 cycles for all channels (each 3-bit field = 0b100).
+    // Set sample time to 84 cycles for channels 0-15 (each 3-bit field = 0b100).
     // TODO: This should be configurable at some point
-    ADC1->SMPR2 = 0x24924924;
+    ADC1->SMPR2 = 0x24924924; // channels 0-9
+    ADC1->SMPR1 = 0x00024924; // channels 10-15
 
     // Power on the ADC once and let it stabilize (tSTAB). Leaving it on
     // avoids re-paying the stabilization time on every conversion.
