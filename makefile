@@ -15,7 +15,7 @@ LIB_NAME     = libarmory.a
 LD_SCRIPT    = linker.ld
 
 # Flags
-CFLAGS  = -mcpu=cortex-m4 -mthumb -Wall -nostdlib -nostartfiles -O0 -g -I$(INCLUDE_DIR)
+CFLAGS  = -mcpu=cortex-m4 -mthumb -Wall -nostdlib -nostartfiles -O2 -g -I$(INCLUDE_DIR)
 LDFLAGS = -T$(LD_SCRIPT)
 
 # Colors
@@ -47,6 +47,11 @@ $(OBJ_DIR)/lib/%.o: $(SRC_DIR)/%.c
 	@mkdir -p $(dir $@)
 	$(ECHO) "$(YELLOW)[CC]       $<$(RESET)"
 	$(CC) $(CFLAGS) -c $< -o $@
+
+# mem.o provides the freestanding memcpy/memset/etc. Compile it so the loop-idiom
+# optimizer does not rewrite those functions' own loops into recursive calls to
+# themselves (which it otherwise does at -O1 and above).
+$(OBJ_DIR)/lib/mem.o: CFLAGS += -fno-tree-loop-distribute-patterns -fno-builtin
 
 # Template to build examples
 define EXAMPLE_template
